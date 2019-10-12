@@ -1,4 +1,4 @@
-# Set up CloudWatch group and log stream and retain logs for 30 days
+# # Set up CloudWatch group and log stream and retain logs for 30 days
 resource "aws_cloudwatch_log_group" "paystack_log_group" {
   name              = "/ecs/paystack-app"
   retention_in_days = 30

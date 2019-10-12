@@ -32,9 +32,20 @@ variable "app_port" {
   default = "3000"
 }
 
-variable "app_image" {
-  default     = "839162139045.dkr.ecr.us-east-2.amazonaws.com/paystack:latest"
+variable "host_port" {
+  default = "0"
 }
+
+
+variable "app_image" {
+  default     = ""
+}
+
+variable "mongo_uri" {}
+
+variable "redis_uri" {}
+
+
 
 variable "ecs_task_execution_role_name" {
   default = "PaystackEcsTaskExecutionRole"

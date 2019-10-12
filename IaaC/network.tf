@@ -1,4 +1,4 @@
-# Availablity Zone
+# # Availablity Zone
 data "aws_availability_zones" "available" {
   state = "available"
 }
@@ -13,7 +13,7 @@ resource "aws_vpc" "main" {
   }
 }
 
-# Create Private Subnet
+# # Create Private Subnet
 resource "aws_subnet" "private" {
   vpc_id     = "${aws_vpc.main.id}"
   cidr_block = "${var.private_subnet}"

@@ -1,52 +1,52 @@
-# ECS task execution role data
-data "aws_iam_policy_document" "ecs_task_execution_role" {
-  version = "2012-10-17"
+resource "aws_iam_role" "ecs-instance-role" {
+  name = "ecs-instance-role"
+  path = "/"
+  assume_role_policy = "${data.aws_iam_policy_document.ecs-instance-policy.json}"
+}
+
+data "aws_iam_policy_document" "ecs-instance-policy" {
   statement {
-    sid = ""
-    effect = "Allow"
     actions = ["sts:AssumeRole"]
 
     principals {
-      type        = "Service"
-      identifiers = ["ecs-tasks.amazonaws.com"]
+      type = "Service"
+      identifiers = ["ec2.amazonaws.com"]
     }
   }
 }
 
-# ECS task execution role
-resource "aws_iam_role" "ecs_task_execution_role" {
-  name               = "${var.ecs_task_execution_role_name}"
-  assume_role_policy = "${data.aws_iam_policy_document.ecs_task_execution_role.json}"
+resource "aws_iam_role_policy_attachment" "ecs-instance-role-attachment" {
+  role = "${aws_iam_role.ecs-instance-role.name}"
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
 }
 
-# ECS task execution role policy attachment
-resource "aws_iam_role_policy_attachment" "ecs_task_execution_role" {
-  role       = "${aws_iam_role.ecs_task_execution_role.name}"
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
-}
-
-# ECS auto scale role data
-data "aws_iam_policy_document" "ecs_auto_scale_role" {
-  version = "2012-10-17"
-  statement {
-    effect = "Allow"
-    actions = ["sts:AssumeRole"]
-
-    principals {
-      type        = "Service"
-      identifiers = ["application-autoscaling.amazonaws.com"]
-    }
+resource "aws_iam_instance_profile" "ecs-instance-profile" {
+  name = "ecs-instance-profile"
+  path = "/"
+  role = "${aws_iam_role.ecs-instance-role.id}"
+  provisioner "local-exec" {
+    command = "sleep 60"
   }
 }
 
-# ECS auto scale role
-resource "aws_iam_role" "ecs_auto_scale_role" {
-  name               = "${var.ecs_auto_scale_role_name}"
-  assume_role_policy = "${data.aws_iam_policy_document.ecs_auto_scale_role.json}"
+resource "aws_iam_role" "ecs-service-role" {
+  name = "ecs-service-role"
+  path = "/"
+  assume_role_policy = "${data.aws_iam_policy_document.ecs-service-policy.json}"
 }
 
-# ECS auto scale role policy attachment
-resource "aws_iam_role_policy_attachment" "ecs_auto_scale_role" {
-  role       = "${aws_iam_role.ecs_auto_scale_role.name}"
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceAutoscaleRole"
+resource "aws_iam_role_policy_attachment" "ecs-service-role-attachment" {
+  role = "${aws_iam_role.ecs-service-role.name}"
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceRole"
+}
+
+data "aws_iam_policy_document" "ecs-service-policy" {
+  statement {
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type = "Service"
+      identifiers = ["ecs.amazonaws.com"]
+    }
+  }
 }
